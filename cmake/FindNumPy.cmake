@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.9)
 
 if(NOT PYTHON_EXECUTABLE)
     find_package(PythonInterp REQUIRED)
