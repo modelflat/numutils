@@ -1,5 +1,5 @@
-#ifndef NUMERICAL4THCOURSE_NUMERICALUTILS_HPP
-#define NUMERICAL4THCOURSE_NUMERICALUTILS_HPP
+#ifndef NU_NUMERICALUTILS_HPP
+#define NU_NUMERICALUTILS_HPP
 
 #include <numeric>
 #include <algorithm>
@@ -9,9 +9,7 @@
 #include <Surface.hpp>
 #include <Range.hpp>
 
-//#define FUNCTIONUTILS_DEBUG
-
-#ifdef FUNCTIONUTILS_DEBUG
+#ifdef NUMERICALUTILS_DEBUG_OUTPUT
 #include <iostream>
 #include <iomanip>
 
@@ -45,6 +43,8 @@ void printVector(const char* cap, const std::vector<T>& v) {
 #define DEBUG_PRINT_VECTOR(caption, vector);
 #endif
 
+namespace nya {
+
 template <typename T>
 struct PrecisionTraitsBase {
     constexpr static T derivativePrecision();
@@ -63,7 +63,7 @@ auto integral(F f) {
     Stepper<T> stepper;
     return [=](Range<T> D) {
         return std::accumulate(D.begin(), D.end(), static_cast<T>(0.0),
-                               [=](T acc, T el) { return acc + stepper(el, D.step, f); });
+                               [=](T acc, T el) { return acc + stepper(el, D.step(), f); });
     };
 }
 
@@ -215,4 +215,6 @@ auto simplePolynomials(size_t maxOrder) {
     return fns;
 }
 
-#endif //NUMERICAL4THCOURSE_NUMERICALUTILS_HPP
+} // nya
+
+#endif //NU_NUMERICALUTILS_HPP

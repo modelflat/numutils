@@ -1,6 +1,8 @@
 #include <NumericalUtils.hpp>
 #include <MatPlotLib.hpp>
 
+using namespace nya;
+
 int main() {
     // 1. define how differential operator looks like / compile-time only for now
     auto differentialOperator = [](auto f) { return sum( D(f), negate(f) ); };

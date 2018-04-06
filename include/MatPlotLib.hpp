@@ -1,5 +1,5 @@
-#ifndef NUMERICAL4THCOURSE_MATPLOTLIB_HPP
-#define NUMERICAL4THCOURSE_MATPLOTLIB_HPP
+#ifndef NU_MATPLOTLIB_HPP
+#define NU_MATPLOTLIB_HPP
 
 /**
  * Convenience wrapper-header for matplotlibcpp.h (https://github.com/lava/matplotlib-cpp)
@@ -8,12 +8,17 @@
 // NOTE: we include math.h to avoid errors (appearing on windows when compiling with gcc/clang using MSYS2)
 // of type "no member named ::X in global namespace". These emerge from Python.h->pyport.h for some reason.
 #include <math.h> // NOLINT
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
 #include <matplotlibcpp.h>
+#pragma GCC diagnostic pop
+
 #include <Range.hpp>
 
 // alias long namespace name. Ple-e-ease, stop naming namespaces like that!
 namespace mpl = matplotlibcpp;
+
+namespace nya {
 
 template <typename T, typename Fn>
 void plot(Range<T> xRange, Fn function, const char* format) {
@@ -43,4 +48,6 @@ void plot(Range<T> xRange, Fn function, const char* format) {
     if (res) Py_DECREF(res);
 };
 
-#endif //NUMERICAL4THCOURSE_MATPLOTLIB_HPP
+} // nya
+
+#endif //NU_MATPLOTLIB_HPP

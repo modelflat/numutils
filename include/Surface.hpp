@@ -1,7 +1,9 @@
-#ifndef NUMERICAL4THCOURSE_SURFACE_HPP
-#define NUMERICAL4THCOURSE_SURFACE_HPP
+#ifndef NU_SURFACE_HPP
+#define NU_SURFACE_HPP
 
 #include <vector>
+
+namespace nya {
 
 template< typename T, bool rowMajor = true, typename Alloc = std::allocator<T> >
 class Surface : public std::vector<T, Alloc> {
@@ -117,4 +119,6 @@ public:
 
 };
 
-#endif //NUMERICAL4THCOURSE_SURFACE_HPP
+} // nya
+
+#endif //NU_SURFACE_HPP

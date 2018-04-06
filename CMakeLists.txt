@@ -1,23 +1,39 @@
 cmake_minimum_required(VERSION 3.10)
-project(Numerical4thCourse)
+project(NumUtils)
+
+option(BUILD_DEBUG OFF)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+if (BUILD_DEBUG)
+    set(OPTIMIZATIONS "-O0")
+else()
+    set(OPTIMIZATIONS "-O3")
+endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OPTIMIZATIONS} -Wall -Wextra -Wpedantic -Werror" )
+
+if (BUILD_DEBUG)
+    add_definitions(-DNUMERICALUTILS_DEBUG_OUTPUT)
+endif()
 
 include_directories(include)
-include_directories(matplotlib-cpp)
+include_directories(SYSTEM matplotlib-cpp)
 
 find_package(PythonLibs REQUIRED 3)
-set(NUMPY_INCLUDE_DIRS "${PYTHON_INCLUDE_DIRS}/../Lib/site-packages/numpy/core/include") # todo make system-independent
-message(${NUMPY_INCLUDE_DIRS})
+find_package(NumPy REQUIRED)
 
-set(SOURCES
-    src/main.cpp)
+include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIR})
 
-add_executable(Numerical4thCourse ${SOURCES})
-target_include_directories(Numerical4thCourse PRIVATE
-                           ${PYTHON_INCLUDE_DIRS}
-                           ${NUMPY_INCLUDE_DIRS}
-                           )
-target_link_libraries(Numerical4thCourse ${PYTHON_LIBRARIES})
+find_package(GTest REQUIRED)
+
+set(TEST_SOURCES
+    test/RangeTest.cpp
+    )
+
+add_executable       (NumUtilsTest ${TEST_SOURCES})
+target_link_libraries(NumUtilsTest ${PYTHON_LIBRARIES} ${GTEST_BOTH_LIBRARIES})
+
+add_executable       (Example_Galerkin examples/Galerkin.cpp)
+target_link_libraries(Example_Galerkin ${PYTHON_LIBRARIES})
