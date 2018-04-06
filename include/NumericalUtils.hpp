@@ -1,5 +1,5 @@
-#ifndef NU_NUMERICALUTILS_HPP
-#define NU_NUMERICALUTILS_HPP
+#ifndef NUMUTILS_NUMERICALUTILS_HPP
+#define NUMUTILS_NUMERICALUTILS_HPP
 
 #include <numeric>
 #include <algorithm>
@@ -97,7 +97,7 @@ template <typename T = double, typename F>
 auto D2(F f) {
     auto h = PrecisionTraits<T>::derivativePrecision() * 1000; // todo move to traits
     return [=](auto x) { return (f(x + h) - 2 * f(x) + f(x - h)) / (h * h); };
-};
+}
 
 template <typename F>
 auto negate(F f) {
@@ -217,4 +217,4 @@ auto simplePolynomials(size_t maxOrder) {
 
 } // nya
 
-#endif //NU_NUMERICALUTILS_HPP
+#endif //NUMUTILS_NUMERICALUTILS_HPP

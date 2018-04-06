@@ -1,5 +1,5 @@
-#ifndef NU_RANGE_HPP
-#define NU_RANGE_HPP
+#ifndef NUMUTILS_RANGE_HPP
+#define NUMUTILS_RANGE_HPP
 
 #include <iterator>
 
@@ -59,9 +59,6 @@ public:
     template <typename Size, typename = std::enable_if_t<std::is_integral_v<Size>>>
     Range(T start, Size count, T step) : start_(start), count_(count), step_(step) {}
 
-    template <size_t stepOrder = 6, ssize_t __v = IntegralPow<10, stepOrder>::v>
-    Range(T from, T to) : start_(from), count_(__v), step_((to - from) / __v) {}
-
     inline size_t startIdx() const noexcept {
         return static_cast<size_t>( start_ / step_ );
     }
@@ -88,6 +85,12 @@ public:
 
 };
 
+
+template <size_t stepOrder = 6, typename T = double, ssize_t __v = IntegralPow<10, stepOrder>::v>
+auto discreteRange(T from, T to) {
+    return Range { from,  __v, (to - from) / __v };
+}
+
 } // nya
 
-#endif //NU_RANGE_HPP
+#endif //NUMUTILS_RANGE_HPP

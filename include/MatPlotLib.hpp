@@ -1,5 +1,5 @@
-#ifndef NU_MATPLOTLIB_HPP
-#define NU_MATPLOTLIB_HPP
+#ifndef NUMUTILS_MATPLOTLIB_HPP
+#define NUMUTILS_MATPLOTLIB_HPP
 
 /**
  * Convenience wrapper-header for matplotlibcpp.h (https://github.com/lava/matplotlib-cpp)
@@ -46,8 +46,8 @@ void plot(Range<T> xRange, Fn function, const char* format) {
 
     Py_DECREF(plot_args);
     if (res) Py_DECREF(res);
-};
+}
 
 } // nya
 
-#endif //NU_MATPLOTLIB_HPP
+#endif //NUMUTILS_MATPLOTLIB_HPP

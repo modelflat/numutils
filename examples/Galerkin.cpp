@@ -9,7 +9,7 @@ int main() {
     // 2. define vector of trial functions / run-time possible
     auto trialFunctions = simplePolynomials(4);
     // 3. define interval of approximating / run-time possible
-    auto interval = Range { 0.0, 2.0 };
+    auto interval = discreteRange( 0.0, 2.0 );
     // 4. use Galerkin's method to find an approximating function on some interval / run-time possible
     auto y = galerkin<RK4>( differentialOperator, trialFunctions ) ( interval );
 

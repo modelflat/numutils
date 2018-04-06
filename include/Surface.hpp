@@ -1,5 +1,5 @@
-#ifndef NU_SURFACE_HPP
-#define NU_SURFACE_HPP
+#ifndef NUMUTILS_SURFACE_HPP
+#define NUMUTILS_SURFACE_HPP
 
 #include <vector>
 
@@ -121,4 +121,4 @@ public:
 
 } // nya
 
-#endif //NU_SURFACE_HPP
+#endif //NUMUTILS_SURFACE_HPP
