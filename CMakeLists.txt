@@ -3,6 +3,8 @@ project(Numerical4thCourse)
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+
 include_directories(include)
 include_directories(matplotlib-cpp)
 
@@ -11,8 +13,7 @@ set(NUMPY_INCLUDE_DIRS "${PYTHON_INCLUDE_DIRS}/../Lib/site-packages/numpy/core/i
 message(${NUMPY_INCLUDE_DIRS})
 
 set(SOURCES
-    src/main.cpp
-    )
+    src/main.cpp)
 
 add_executable(Numerical4thCourse ${SOURCES})
 target_include_directories(Numerical4thCourse PRIVATE
