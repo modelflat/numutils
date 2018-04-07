@@ -1,4 +1,6 @@
-# Num[erical]Utils
+# Num[erical]Utils 
+[![Build Status](https://travis-ci.org/modelflat/numutils.svg?branch=master)](https://travis-ci.org/modelflat/numutils)
+
 Yet another home-grown numerical utils for C++
 
 This small library provides you with convenient functional interfaces to write numerical-related code (integrals, derivatives and so).
