@@ -6,8 +6,9 @@
 #include <functional>
 #include <cmath>
 
-#include <Surface.hpp>
-#include <Range.hpp>
+#include "Surface.hpp"
+#include "Range.hpp"
+#include "PrecisionTraits.hpp"
 
 #ifdef NUMERICALUTILS_DEBUG_OUTPUT
 #include <iostream>
@@ -44,19 +45,6 @@ void printVector(const char* cap, const std::vector<T>& v) {
 #endif
 
 namespace nya {
-
-template <typename T>
-struct PrecisionTraitsBase {
-    constexpr static T derivativePrecision();
-};
-
-template <typename T>
-struct PrecisionTraits : PrecisionTraitsBase<T> {};
-
-template <>
-struct PrecisionTraits<double> {
-    constexpr static double derivativePrecision() { return 1e-10; }
-};
 
 template < template <typename> typename Stepper, typename T = double, typename F >
 auto integral(F f) {
@@ -106,12 +94,12 @@ auto negate(F f) {
 
 template <typename ... Fs>
 auto sum(Fs ... functions) {
-    return [=](auto x) { return (... + functions(x)); };
+    return [=](auto x) { return (0.0 + ... + functions(x)); };
 }
 
 template <typename ... Fs>
 auto product(Fs ... functions) {
-    return [=](auto x) { return (... * functions(x)); };
+    return [=](auto x) { return (1.0 * ... * functions(x)); };
 }
 
 template <template <typename> typename Stepper, typename T = double, typename ... Fs>

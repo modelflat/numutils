@@ -3,6 +3,8 @@
 
 #include <iterator>
 
+#include "PrecisionTraits.hpp"
+
 namespace nya {
 
 template <int64_t value, int64_t power>
@@ -59,36 +61,29 @@ public:
     template <typename Size, typename = std::enable_if_t<std::is_integral_v<Size>>>
     Range(T start, Size count, T step) : start_(start), count_(count), step_(step) {}
 
-    inline size_t startIdx() const noexcept {
-        return static_cast<size_t>( start_ / step_ );
+    inline T start() const noexcept {
+        return start_;
     }
-
-    inline size_t stopIdx() const noexcept {
-        return startIdx() + count_ - 1;
-    }
-
-    inline size_t count() const noexcept {
-        return count_;
-    }
-
     inline T step() const noexcept {
         return step_;
+    }
+    inline size_t count() const noexcept {
+        return count_;
     }
 
     inline auto begin() const noexcept {
         return RangeIterator<T> { 0, start_, step_ };
     }
-
     inline auto end() const noexcept {
         return RangeIterator<T> { count_, start_, step_ };
     }
-
 };
 
 
 template <size_t stepOrder = 6, typename T = double, ssize_t __v = IntegralPow<10, stepOrder>::v>
-auto discreteRange(T from, T to) {
-    return Range { from,  __v, (to - from) / __v };
+inline auto discreteRange(T from, T to) noexcept {
+    const T diff = to - from;
+    return Range { from,  __v, diff / __v };
 }
 
 } // nya

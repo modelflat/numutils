@@ -13,7 +13,7 @@
 #include <matplotlibcpp.h>
 #pragma GCC diagnostic pop
 
-#include <Range.hpp>
+#include "Range.hpp"
 
 // alias long namespace name. Ple-e-ease, stop naming namespaces like that!
 namespace mpl = matplotlibcpp;

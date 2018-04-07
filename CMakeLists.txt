@@ -42,7 +42,7 @@ include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
 set(TEST_SOURCES
     test/TestUtils.hpp
     test/RangeTest.cpp
-    )
+    test/NumUtilsTest.cpp)
 
 add_executable       (NumUtilsTest ${TEST_SOURCES})
 target_link_libraries(NumUtilsTest ${PYTHON_LIBRARIES} gtest ${GTEST_BOTH_LIBRARIES})
