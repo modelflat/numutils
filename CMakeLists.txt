@@ -1,19 +1,15 @@
 cmake_minimum_required(VERSION 3.9)
 project(NumUtils)
 
-option(BUILD_DEBUG OFF)
 option(BUILD_EXAMPLES ON)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-if (BUILD_DEBUG)
-    set(OPTIMIZATIONS "-O0")
-else()
-    set(OPTIMIZATIONS "-O3")
-endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OPTIMIZATIONS} -std=c++1z -Wall -Wextra -Werror" )
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -Wall -Wextra" )
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 
 if (BUILD_DEBUG)
     add_definitions(-DNUMERICALUTILS_DEBUG_OUTPUT)
@@ -22,7 +18,8 @@ endif()
 include_directories(include)
 include_directories(SYSTEM matplotlib-cpp)
 
-if (BUILD_EXAMPLES)
+if (BUILD_EXAMPLES OR CLION_IDE_FIX_CONDITIONAL_TARGETS)
+    # conditional targets are not visible in CLion for some reason, even if BUILD_EXAMPLES == ON
     find_package(PythonLibs REQUIRED 3)
     find_package(NumPy REQUIRED)
     include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIR})
@@ -48,3 +45,7 @@ add_executable       (NumUtilsTest ${TEST_SOURCES})
 target_link_libraries(NumUtilsTest ${PYTHON_LIBRARIES} gtest ${GTEST_BOTH_LIBRARIES})
 add_test ( NUTests NumUtilsTest )
 
+if (${CMAKE_BUILD_TYPE} MATCHES Coverage)
+    include(CodeCoverage)
+    SETUP_TARGET_FOR_COVERAGE(coverage NumUtilsTest coverage_out)
+endif()
