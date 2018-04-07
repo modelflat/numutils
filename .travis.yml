@@ -44,15 +44,19 @@ before_script:
   - gcov --version
   - g++ --version
   - ls -l
-  - mkdir build
-  - cd build
 
 script:
-  - cmake -DCMAKE_BUILD_TYPE=Coverage -DBUILD_EXAMPLES=OFF ..
+  # release
+  - mkdir build-release && cd build-release
+  - cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=OFF ..
   - make
+  - cd ..
+  # coverage
+  - mkdir build-coverage && cd build-coverage
+  - cmake -DCMAKE_BUILD_TYPE=Coverage -DBUILD_EXAMPLES=OFF ..
   - make coverage
-  - ctest
 
 after_success:
+  - ls -l
   - lcov --list coverage_out.info.cleaned  # Show test report in travis log.
   - coveralls-lcov coverage_out.info.cleaned  # uploads to coveralls

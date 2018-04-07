@@ -6,10 +6,9 @@ option(BUILD_EXAMPLES ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -Wall -Wextra" )
+set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -std=c++1z -Wall -Wextra" )
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
+set(CMAKE_CXX_FLAGS_DEBUG   "-O0 -g")
 
 if (BUILD_DEBUG)
     add_definitions(-DNUMERICALUTILS_DEBUG_OUTPUT)
@@ -41,15 +40,23 @@ set(TEST_SOURCES
     test/RangeTest.cpp
     test/NumUtilsTest.cpp)
 
-add_executable       (NumUtilsTest ${TEST_SOURCES})
 if (${CMAKE_BUILD_TYPE} MATCHES Coverage)
     include(CodeCoverage)
-    target_compile_options(NumUtilsTest PRIVATE
-                           -g -O0 --coverage -fprofile-arcs -ftest-coverage
-                           -fno-inline -fno-inline-small-functions -fno-default-inline)
-    SETUP_TARGET_FOR_COVERAGE(coverage NumUtilsTest coverage_out)
+    add_executable        (NumUtilsTestCoverage ${TEST_SOURCES})
+    target_link_libraries (NumUtilsTestCoverage ${PYTHON_LIBRARIES} gtest ${GTEST_BOTH_LIBRARIES})
+    target_compile_options(NumUtilsTestCoverage PRIVATE
+                           -g3 -Og --coverage -fprofile-arcs -ftest-coverage
+                           -fno-inline
+                           -fno-inline-small-functions
+                           -fno-default-inline
+                           #                           -fkeep-inline-functions
+                           )
+    SETUP_TARGET_FOR_COVERAGE(coverage NumUtilsTestCoverage coverage_out)
+    add_test(NUTests NumUtilsTestCoverage)
+else()
+    add_executable       (NumUtilsTest ${TEST_SOURCES})
+    target_link_libraries(NumUtilsTest ${PYTHON_LIBRARIES} gtest ${GTEST_BOTH_LIBRARIES})
+    add_test             (NUTests NumUtilsTest)
 endif()
-target_link_libraries(NumUtilsTest ${PYTHON_LIBRARIES} gtest ${GTEST_BOTH_LIBRARIES})
 
-add_test ( NUTests NumUtilsTest )
 
