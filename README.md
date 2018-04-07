@@ -1,5 +1,7 @@
 # Num[erical]Utils 
 [![Build Status](https://travis-ci.org/modelflat/numutils.svg?branch=master)](https://travis-ci.org/modelflat/numutils)
+[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
+[![Coverage Status](https://coveralls.io/repos/github/modelflat/numutils/badge.svg?branch=master)](https://coveralls.io/github/modelflat/numutils?branch=master) _<sup>(coverage is broken for now, probably because we are header only, searching for solution)</sup>_
 
 Yet another home-grown numerical utils for C++
 
