@@ -50,13 +50,13 @@ TEST(NumUtilsTest, FunctionNegation) {
 }
 
 TEST(NumUtilsTest, FunctionDerivative) {
-    double x = 5.2;
+    double x = 4;
     auto f = [](auto x) { return x*x - x; };
 
     // first
-    EXPECT_NEAR(nya::D(f)(x), 2.0*x - 1.0, PrecisionTraits<double>::derivativeError());
+    EXPECT_NEAR(nya::D<nya::LSFD1>(f)(x), (2.0*x - 1.0), nya::PrecisionTraits<double>::derivativeError());
     // second // todo too big error, fix
-//    EXPECT_NEAR(nya::D2(f)(x), 2.0, PrecisionTraits<double>::derivativeError());
+//    EXPECT_NEAR(nya::D<nya::>(f)(x), 2.0, PrecisionTraits<double>::derivativeError() * 100);
 }
 
 TEST(NumUtilsTest, FunctionIntegral_Euler) {
@@ -68,9 +68,23 @@ TEST(NumUtilsTest, FunctionIntegral_Euler) {
 
 TEST(NumUtilsTest, FunctionIntegral_RK4) {
     auto xRange = nya::discreteRange<6>(0.0, 1.0);
-    auto f = [](auto x) { return x*x - x; };
+    auto f = [](auto x) { return x * x - x; };
 
-    EXPECT_NEAR(nya::integral<nya::RK4>(f)(xRange), 1.0/3.0 - 1.0/2.0, 1e-10); // todo move absError into Stepper classes
+    EXPECT_NEAR(nya::integral<nya::RK4>(f)(xRange), 1.0 / 3.0 - 1.0 / 2.0, 1e-10); // todo move absError into Stepper classes
+}
+
+TEST(NumUtilsTest, FunctionIntegral_Multi) {
+    auto xRange = nya::discreteRange<6>(0.0, 1.0);
+    auto f = [](auto x, auto y) { return y*std::sin(x) + x*std::cos(y); };
+    // int( f )|x[0,1] : -y*cos(1) - y*cos(0) + cos(y)/2
+    // int( f )|y[0,1] : sin(x)/2 + x*sin(1)
+
+    // integral by x; y = 1
+    auto f2ByX = nya::integral<nya::RK4, 0>(f);
+    EXPECT_NEAR(f2ByX(xRange, 0.0, 1), -std::cos(1) + std::cos(0) + std::cos(1)/2, 1e-6); // todo low precision
+    // integral by y; x = 1
+    auto f2ByY = nya::integral<nya::RK4, 1>(f);
+    EXPECT_NEAR(f2ByY(xRange, 1, 0.0), std::sin(1)/2 + std::sin(1), 1e-6); // todo low precision
 }
 
 TEST(NumUtilsTest, FunctionInnerProduct) {

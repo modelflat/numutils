@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <functional>
 #include <cmath>
+#include <tuple>
 
 #include "Surface.hpp"
 #include "Range.hpp"
@@ -46,19 +47,46 @@ void printVector(const char* cap, const std::vector<T>& v) {
 
 namespace nya {
 
-template < template <typename> typename Stepper, typename T = double, typename F >
+template <typename F>
+auto negate(F f) {
+    return [=](auto... x) { return -f(x...); };
+}
+
+template <typename ... Fs>
+auto sum(Fs ... f) {
+    return [=](auto... x) { return (0.0 + ... + f(x...)); };
+}
+
+template <typename ... Fs>
+auto product(Fs ... f) {
+    return [=](auto... x) { return (1.0 * ... * f(x...)); };
+}
+
+template <
+    template <typename> typename Stepper, size_t var = 0, typename T = double, typename F
+>
 auto integral(F f) {
     Stepper<T> stepper;
-    return [=](Range<T> D) {
-        return std::accumulate(D.begin(), D.end(), static_cast<T>(0.0),
-                               [=](T acc, T el) { return acc + stepper(el, D.step(), f); });
+    return [=] (Range<T> D, auto... x0) {
+        if constexpr (sizeof...(x0) == 0) {
+            return std::accumulate(D.begin(), D.end(), 0.0,
+                                   [stepper, f, D](T acc, T x) { return acc + stepper(f, D.step(), x); });
+        } else {
+            auto fBound = [f, x0...](auto x) mutable { // todo heavy lambda?
+                auto _tX0 = std::forward_as_tuple(std::forward<decltype(x0)>(x0)...);
+                std::get<var>(_tX0) = x;
+                return f(x0...);
+            };
+            return std::accumulate(D.begin(), D.end(), 0.0,
+                                   [stepper, fBound, D](T acc, T x) { return acc + stepper(fBound, D.step(), x); });
+        }
     };
 }
 
 template <typename T>
 struct Euler {
     template <typename F>
-    T operator()(T x, T h, F f) const {
+    T operator()(F f, T h, T x) const {
         return h * f(x);
     }
 };
@@ -66,7 +94,7 @@ struct Euler {
 template <typename T>
 struct RK4 {
     template <typename F>
-    T operator()(T x, T h, F f) const {
+    T operator()(F f, T h, T x) const {
         const auto k1 = f(x);
         const auto k2 = f(x + k1 * h / 2);
         const auto k3 = f(x + k2 * h / 2);
@@ -75,38 +103,60 @@ struct RK4 {
     }
 };
 
-template <typename T = double, typename F>
-auto D(F f) {
-    auto h = PrecisionTraits<T>::derivativePrecision();
-    return [=](auto x) { return (f(x + h) - f(x - h)) / (2 * h); };
-}
-// todo generalize derivatives
-template <typename T = double, typename F>
-auto D2(F f) {
-    auto h = PrecisionTraits<T>::derivativePrecision() * 1000; // todo move to traits
-    return [=](auto x) { return (f(x + h) - 2 * f(x) + f(x - h)) / (h * h); };
-}
-
-template <typename F>
-auto negate(F f) {
-    return [=](auto x) { return -f(x); };
-}
-
-template <typename ... Fs>
-auto sum(Fs ... functions) {
-    return [=](auto x) { return (0.0 + ... + functions(x)); };
-}
-
-template <typename ... Fs>
-auto product(Fs ... functions) {
-    return [=](auto x) { return (1.0 * ... * functions(x)); };
-}
-
-template <template <typename> typename Stepper, typename T = double, typename ... Fs>
+template <
+    template <typename> typename Stepper, size_t var = 0, typename T = double, typename ... Fs
+>
 auto innerProduct(Fs ... functions) {
     const auto pr = product(functions...);
-    return integral<Stepper, T>([=](auto x) { return pr(x); });
+    return integral<Stepper, var, T>([=](auto... x) { return pr( x... ); });
 }
+
+template <
+    template <typename> typename DiffMethod, size_t order = 1, size_t var = 0, typename T = double, typename F
+>
+auto D(F f) {
+    DiffMethod<T> method;
+    return [=](auto... x) { return method.template compute<order, var>(f, x...); };
+}
+
+template <typename T>
+struct LSFD1 {
+    template <size_t order, size_t var, typename F, typename ...Args>
+    auto compute(F f, Args... x) const { // not operator() to more intuitive template args
+        const auto h = PrecisionTraits<T>::derivativePrecision(order);
+        const auto base = f(x...);
+        auto vars = std::forward_as_tuple(std::forward<decltype(x)>(x)...);
+        std::get<var>(vars) -= h;
+        const auto left = f(x...);
+        auto result = ( base - left ) / h;
+        return result;
+    }
+};
+
+template <typename T>
+struct LSFD2 {
+    template <size_t order, size_t var, typename F, typename ...Args>
+    auto compute(F f, Args... x) const {
+        const auto h = PrecisionTraits<T>::derivativePrecision(order);
+        auto vars = std::forward_as_tuple(std::forward<decltype(x)>(x)...);
+        const auto base  = f(x...);
+        std::get<var>(vars) -= h;
+        const auto left  = f(x...);
+        std::get<var>(vars) += 2.0 * h;
+        const auto right = f(x...);
+        return ( 3.0*base - 4.0*left + right ) / (2.0 * h);
+    }
+};
+
+template <typename T>
+struct RSFD1;
+template <typename T>
+struct RSFD2;
+template <typename T>
+struct CSFD2;
+template <typename T>
+struct CSFD4;
+
 
 template <typename T, typename Alloc = std::allocator<T>>
 using Vector = std::vector<T, Alloc>;
@@ -170,7 +220,7 @@ auto makeTrialFunction(std::vector<F> trials, std::vector<T> coefs) {
     };
 }
 
-template <template <typename> typename Stepper, typename T = double, typename DiffOp, typename F>
+template <template <typename> typename Stepper, size_t var = 0, typename T = double, typename DiffOp, typename F>
 auto galerkin(DiffOp LOp, std::vector<F> trials) {
     return [=](Range<T> range) {
         Surface<T> matrix (trials.size() - 1, trials.size());
@@ -178,11 +228,11 @@ auto galerkin(DiffOp LOp, std::vector<F> trials) {
             auto phiK = trials[row];
             // compute free coef
             *(matrix.begin() + matrix.columnCount()*row + trials.size() - 1) =
-                -innerProduct<Stepper, T>(LOp(trials[0]), phiK)(range);
+                -innerProduct<Stepper, var, T>(LOp(trials[0]), phiK)(range);
             // compute other coefficents
             std::transform(trials.begin() + 1, trials.end(), matrix.begin() + matrix.columnCount() * row,
                                [phiK, range, LOp](auto phiJ) {
-                               return innerProduct<Stepper, T>(LOp(phiJ), phiK)(range);
+                               return innerProduct<Stepper, var, T>(LOp(phiJ), phiK)(range);
                            });
         }
         DEBUG_PRINT_SURFACE("Galerkin method -- out matrix", matrix);
