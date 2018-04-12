@@ -8,7 +8,9 @@ Yet another home-grown numerical utils for C++
 This small library provides you with convenient functional interfaces to write numerical-related code (integrals, derivatives and so).
 It primarily consists of heavily templated code and is (currently) not so customizable in run-time.
 
-Check examples/ directory for usage examples.
+[Documentation can be found here](https://modelflat.github.io/numutils/index.html) (updated automatically).
+
+Check examples/ directory for usage examples. 
 
 ## Build
 
