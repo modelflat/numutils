@@ -5,9 +5,9 @@ using namespace nya;
 
 int main() {
     // 1. define how differential operator looks like / compile-time only for now
-    auto differentialOperator = [](auto f) { return sum( D(f), negate(f) ); };
+    auto differentialOperator = [](auto f) { return sum( D<LFD1>(f), negate(f) ); };
     // 2. define vector of trial functions / run-time possible
-    auto trialFunctions = simplePolynomials(4);
+    auto trialFunctions = polynomials(4);
     // 3. define interval of approximating / run-time possible
     auto interval = discreteRange( 0.0, 2.0 );
     // 4. use Galerkin's method to find an approximating function on some interval / run-time possible

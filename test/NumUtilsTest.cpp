@@ -54,7 +54,7 @@ TEST(NumUtilsTest, FunctionDerivative) {
     auto f = [](auto x) { return x*x - x; };
 
     // first
-    EXPECT_NEAR(nya::D<nya::LSFD1>(f)(x), (2.0*x - 1.0), nya::PrecisionTraits<double>::derivativeError());
+    EXPECT_NEAR(nya::D<nya::LFD1>(f)(x), (2.0*x - 1.0), nya::PrecisionTraits<double>::derivativeError());
     // second // todo too big error, fix
 //    EXPECT_NEAR(nya::D<nya::>(f)(x), 2.0, PrecisionTraits<double>::derivativeError() * 100);
 }

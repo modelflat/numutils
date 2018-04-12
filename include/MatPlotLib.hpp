@@ -15,7 +15,7 @@
 
 #include "Range.hpp"
 
-// alias long namespace name. Ple-e-ease, stop naming namespaces like that!
+// alias long namespace name.
 namespace mpl = matplotlibcpp;
 
 namespace nya {
