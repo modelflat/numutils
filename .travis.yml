@@ -4,12 +4,21 @@ branches:
   only:
     - master
 
+addons:
+  apt:
+    packages:
+      - doxygen
+      - doxygen-doc
+      - doxygen-latex
+      - doxygen-gui
+      - graphviz
+
 before_install:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update -qq
 
 install:
-  - sudo apt-get install -qq g++-7
+  - sudo apt-get install -qq g++-7 doxygen doxygen-doc doxygen-latex doxygen-gui graphviz
   # update alternatives to use g++-7
   - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 1000
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 1000
@@ -55,8 +64,20 @@ script:
   - mkdir build-coverage && cd build-coverage
   - cmake -DCMAKE_BUILD_TYPE=Coverage -DBUILD_EXAMPLES=OFF ..
   - make coverage
+  - cd ..
+  # docs
+  - cd docs
+  - doxygen Doxyfile
 
 after_success:
   - ls -l
   - lcov --list coverage_out.info.cleaned  # Show test report in travis log.
   - coveralls-lcov coverage_out.info.cleaned  # uploads to coveralls
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  local_dir: $TRAVIS_BUILD_DIR/docs/html
+  github_token: $GITHUB_API_KEY
+  on:
+    branch: master
