@@ -16,7 +16,7 @@
 #include <iomanip>
 
 template <typename T>
-void printSurface(const char* cap, const Surface<T>& surf) {
+void printSurface(const char* cap, const nya::Surface<T>& surf) {
     std::cout << cap << ": " << std::endl;
     for (size_t i = 0; i < surf.rowCount(); ++i) {
         std::cout << std::setprecision(6) << std::left << std::setw(10);
@@ -355,6 +355,25 @@ auto polynomials(size_t maxOrder) {
     }
     return fns;
 }
+
+template <typename T = double, typename Fun = std::function<T(T)>, typename FunVec = std::vector<Fun>>
+auto chebyshevPolynomials(size_t maxOrder) -> FunVec {
+    Fun Tnm1 = [](T) { return static_cast<T>(1); };
+    if (maxOrder == 0) {
+        return { Tnm1 };
+    }
+    Fun Tn = [](T x) { return x; };
+    if (maxOrder == 1) {
+        return { Tnm1, Tn };
+    }
+    FunVec fns { Tnm1 };
+    fns.reserve(maxOrder + 1);
+    for (size_t i = 1; i <= maxOrder; ++i) {
+        fns.emplace_back(Tn);
+        std::tie(Tn, Tnm1) = std::pair { [Tn, Tnm1,i](T x) {  return 2.0*x*Tn(x) - Tnm1(x); }, Tn };
+    }
+    return fns;
+};
 
 } // nya
 
