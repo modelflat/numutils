@@ -81,6 +81,19 @@ auto product(Fs ... f) {
 }
 
 /**
+ * Raises function to the given power.
+ * @tparam T
+ * @tparam F
+ * @param f - function .
+ * @param p - power value.
+ * @return A new function g: g(args...) = f(args...) ** p.
+ */
+template <typename T=double, typename F>
+auto power(F f, T p) {
+    return [=](auto... x) { return std::pow(f(x...), p); };
+}
+
+/**
  * Placeholder variable for calling integral objects with multiple parameters.
  */
 constexpr auto dVar = std::numeric_limits<double>::quiet_NaN();

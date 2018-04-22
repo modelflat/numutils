@@ -95,3 +95,17 @@ TEST(NumUtilsTest, FunctionInnerProduct) {
     // integral( x*exp(x) ) = x*exp(x) - int(exp(x)) = x*exp(x)|0,1 - exp(x)|0,1 = exp(1) - exp(1) - exp(0) = 1.0
     EXPECT_NEAR(nya::innerProduct<nya::RK4>(f, g)(xRange), 1.0, 1e-6); // todo move absError into Stepper classes
 }
+
+TEST(NumUtilsTest, FunctionPower) {
+    auto fxSquared = nya::power([](auto x) { return x; }, 2);
+    EXPECT_DOUBLE_EQ(fxSquared(5), 25);
+
+    auto fxNonInt = nya::power([](auto x) { return x; }, 3.123);
+    EXPECT_DOUBLE_EQ(fxNonInt(5), std::pow(5, 3.123));
+
+    auto fxNegative = nya::power([](auto x) { return x; }, -2);
+    EXPECT_DOUBLE_EQ(fxNegative(5), 1.0 / 25);
+
+    auto fxZero = nya::power([](auto x) { return x + x*x; }, 0);
+    EXPECT_DOUBLE_EQ(fxZero(5), 1);
+}
